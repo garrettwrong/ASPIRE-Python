@@ -32,7 +32,7 @@ setup(
         'importlib_resources>=1.0.2',
         'mrcfile',
         'python-box',
-        'finufftpy',
+#        'finufftpy',
         'console_progressbar',
         'pyfftw',
         'click',
