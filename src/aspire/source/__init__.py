@@ -325,7 +325,7 @@ class ImageSource:
 
         if self._im is not None:
             logger.info(f'Loading images from cache')
-            im = Image(self._im[:, :, indices])
+            im = Image(self._im[indices, :, :])
         else:
             im = self._images(indices=indices, *args, **kwargs)
             im = self.generation_pipeline.forward(im, indices=indices)
