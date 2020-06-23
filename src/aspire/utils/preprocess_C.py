@@ -9,86 +9,86 @@ from scipy.interpolate import RegularGridInterpolator
 from aspire.nfft import Plan
 from aspire.utils import ensure
 from aspire.utils.coor_trans import grid_1d, grid_2d, grid_3d
-from aspire.utils.fft import (centered_fft1, centered_fft2_F, centered_fft3_F,
-                              centered_ifft1, centered_ifft2_F, centered_ifft3_F)
+from aspire.utils.fft import (centered_fft1, centered_fft2_C, centered_fft3_C,
+                              centered_ifft1, centered_ifft2_C, centered_ifft3_C)
 from aspire.utils.matlab_compat import m_reshape
 
 logger = logging.getLogger(__name__)
 
 
-def downsample_centered(insamples, szout):
-    """
-    Blur and downsample 1D to 3D objects such as, curves, images or volumes
+# def downsample_centered(insamples, szout):
+#     """
+#     Blur and downsample 1D to 3D objects such as, curves, images or volumes
 
-    :param insamples: Set of objects to be downsampled in the form of an array, the last dimension
-                    is the number of objects.
-    :param szout: The desired resolution of for output objects.
-    :return: An array consists of the blurred and downsampled objects.
-    """
+#     :param insamples: Set of objects to be downsampled in the form of an array, the last dimension
+#                     is the number of objects.
+#     :param szout: The desired resolution of for output objects.
+#     :return: An array consists of the blurred and downsampled objects.
+#     """
 
-    ensure(insamples.ndim-1 == np.size(szout), 'The number of downsampling dimensions is not the same as that of objects.')
+#     ensure(insamples.ndim-1 == np.size(szout), 'The number of downsampling dimensions is not the same as that of objects.')
 
-    L_in = insamples.shape[0]
-    L_out = szout[0]
-    ndata = insamples.shape[-1]
-    outdims = np.r_[szout, ndata]
-    outsamples = np.zeros(outdims, dtype=insamples.dtype)
+#     L_in = insamples.shape[0]
+#     L_out = szout[0]
+#     ndata = insamples.shape[-1]
+#     outdims = np.r_[ndate, szout, ndata]
+#     outsamples = np.zeros(outdims, dtype=insamples.dtype)
 
-    if insamples.ndim == 2:
-        # stack of one dimension objects
-        grid_in = grid_1d(L_in)
-        grid_out = grid_1d(L_out)
-        # x values corresponding to 'grid'. This is what scipy interpolator needs to function.
-        x = np.ceil(np.arange(-L_in/2, L_in/2)) / (L_in/2)
-        mask = (np.abs(grid_in['x']) < L_out/L_in)
-        insamples_fft = np.real(centered_ifft1(centered_fft1(insamples) * np.expand_dims(mask, 1)))
-        for idata in range(ndata):
-            interpolator = RegularGridInterpolator(
-                (x,),
-                insamples_fft[:, idata],
-                bounds_error=False,
-                fill_value=0
-            )
-            outsamples[:, idata] = interpolator(np.dstack([grid_out['x']]))
+#     if insamples.ndim == 2:
+#         # stack of one dimension objects
+#         grid_in = grid_1d(L_in)
+#         grid_out = grid_1d(L_out)
+#         # x values corresponding to 'grid'. This is what scipy interpolator needs to function.
+#         x = np.ceil(np.arange(-L_in/2, L_in/2)) / (L_in/2)
+#         mask = (np.abs(grid_in['x']) < L_out/L_in)
+#         insamples_fft = np.real(centered_ifft1(centered_fft1(insamples) * np.expand_dims(mask, 1)))
+#         for idata in range(ndata):
+#             interpolator = RegularGridInterpolator(
+#                 (x,),
+#                 insamples_fft[:, idata],
+#                 bounds_error=False,
+#                 fill_value=0
+#             )
+#             outsamples[:, idata] = interpolator(np.dstack([grid_out['x']]))
 
-    elif insamples.ndim == 3:
-        # stack of two dimension objects
-        grid_in = grid_2d(L_in)
-        grid_out = grid_2d(L_out)
-        # x, y values corresponding to 'grid'. This is what scipy interpolator needs to function.
-        x = y = np.ceil(np.arange(-L_in/2, L_in/2)) / (L_in/2)
-        mask = (np.abs(grid_in['x']) < L_out/L_in) & (np.abs(grid_in['y']) < L_out/L_in)
-        insamples_fft = np.real(centered_ifft2_F(centered_fft2_F(insamples) * np.expand_dims(mask, 2)))
-        for idata in range(ndata):
-            interpolator = RegularGridInterpolator(
-                (x, y),
-                insamples_fft[:, :, idata],
-                bounds_error=False,
-                fill_value=0
-            )
-            outsamples[:, :, idata] = interpolator(np.dstack([grid_out['x'], grid_out['y']]))
+#     elif insamples.ndim == 3:
+#         # stack of two dimension objects
+#         grid_in = grid_2d(L_in)
+#         grid_out = grid_2d(L_out)
+#         # x, y values corresponding to 'grid'. This is what scipy interpolator needs to function.
+#         x = y = np.ceil(np.arange(-L_in/2, L_in/2)) / (L_in/2)
+#         mask = (np.abs(grid_in['x']) < L_out/L_in) & (np.abs(grid_in['y']) < L_out/L_in)
+#         insamples_fft = np.real(centered_ifft2_F(centered_fft2_F(insamples) * np.expand_dims(mask, 2)))
+#         for idata in range(ndata):
+#             interpolator = RegularGridInterpolator(
+#                 (x, y),
+#                 insamples_fft[:, :, idata],
+#                 bounds_error=False,
+#                 fill_value=0
+#             )
+#             outsamples[:, :, idata] = interpolator(np.dstack([grid_out['x'], grid_out['y']]))
 
-    elif insamples.ndim == 4:
-        # stack of three dimension objects
-        grid_in = grid_3d(L_in)
-        grid_out = grid_3d(L_out)
-        # x, y, z values corresponding to 'grid'. This is what scipy interpolator needs to function.
-        x = y = z = np.ceil(np.arange(-L_in/2, L_in/2)) / (L_in/2)
-        mask = (np.abs(grid_in['x']) < L_out/L_in) & (np.abs(grid_in['y']) < L_out/L_in) & (np.abs(grid_in['z']) < L_out/L_in)
-        insamples_fft = np.real(centered_ifft3(centered_fft3(insamples) * np.expand_dims(mask, 3)))
-        for idata in range(ndata):
-            interpolator = RegularGridInterpolator(
-                (x, y, z),
-                insamples_fft[:, :, :, idata],
-                bounds_error=False,
-                fill_value=0
-            )
-            outsamples[:, :, :, idata] = interpolator(np.stack((grid_out['x'], grid_out['y'], grid_out['z']), axis=-1))
+#     elif insamples.ndim == 4:
+#         # stack of three dimension objects
+#         grid_in = grid_3d(L_in)
+#         grid_out = grid_3d(L_out)
+#         # x, y, z values corresponding to 'grid'. This is what scipy interpolator needs to function.
+#         x = y = z = np.ceil(np.arange(-L_in/2, L_in/2)) / (L_in/2)
+#         mask = (np.abs(grid_in['x']) < L_out/L_in) & (np.abs(grid_in['y']) < L_out/L_in) & (np.abs(grid_in['z']) < L_out/L_in)
+#         insamples_fft = np.real(centered_ifft3(centered_fft3(insamples) * np.expand_dims(mask, 3)))
+#         for idata in range(ndata):
+#             interpolator = RegularGridInterpolator(
+#                 (x, y, z),
+#                 insamples_fft[:, :, :, idata],
+#                 bounds_error=False,
+#                 fill_value=0
+#             )
+#             outsamples[:, :, :, idata] = interpolator(np.stack((grid_out['x'], grid_out['y'], grid_out['z']), axis=-1))
 
-    else:
-        raise RuntimeError('Number of dimensions > 3 for input objects.')
+#     else:
+#         raise RuntimeError('Number of dimensions > 3 for input objects.')
 
-    return outsamples
+#     return outsamples
 
 
 def crop_pad(mat, n, fill_value=None):
@@ -194,8 +194,8 @@ def downsample(insamples, szout, mask=None):
 
     The function handles odd and even-sized arrays correctly. The center of
     an odd array is taken to be at (n+1)/2, and an even array is n/2+1.
-    :param insamples: Set of objects to be downsampled in the form of an array, the last dimension
-                    is the number of objects.
+    :param insamples: Set of objects to be downsampled in the form of an array.\
+    the first dimension is the number of objects.
     :param szout: The desired resolution of for output objects.
     :return: An array consists of the blurred and downsampled objects.
     """
@@ -203,10 +203,10 @@ def downsample(insamples, szout, mask=None):
     ensure(insamples.ndim-1 == np.size(szout),
            'The number of downsampling dimensions is not the same as that of objects.')
 
-    L_in = insamples.shape[0]
+    L_in = insamples.shape[1]
     L_out = szout[0]
-    ndata = insamples.shape[-1]
-    outdims = np.r_[szout, ndata]
+    ndata = insamples.shape[0]
+    outdims = np.r_[ndata, szout]
 
     outsamples = np.zeros(outdims, dtype=insamples.dtype)
 
@@ -217,20 +217,20 @@ def downsample(insamples, szout, mask=None):
         # stack of one dimension objects
 
         for idata in range(ndata):
-            insamples_fft = crop_pad(fftshift(fft(insamples[:, idata])), L_out)*mask
-            outsamples[:, idata] = np.real(ifft(ifftshift(insamples_fft))*(L_out / L_in))
+            insamples_fft = crop_pad(fftshift(fft(insamples[idata])), L_out)*mask
+            outsamples[idata] = np.real(ifft(ifftshift(insamples_fft))*(L_out / L_in))
 
     elif insamples.ndim == 3:
         # stack of two dimension objects
         for idata in range(ndata):
-            insamples_fft = crop_pad(fftshift(fft2(insamples[:, :, idata])), L_out)*mask
-            outsamples[:, :, idata] = np.real(ifft2(ifftshift(insamples_fft)) * (L_out**2/L_in**2))
+            insamples_fft = crop_pad(fftshift(fft2(insamples[idata])), L_out)*mask
+            outsamples[idata] = np.real(ifft2(ifftshift(insamples_fft)) * (L_out**2/L_in**2))
 
     elif insamples.ndim == 4:
         # stack of three dimension objects
         for idata in range(ndata):
-            insamples_fft = crop_pad(fftshift(fftn(insamples[:, :, :, idata])), L_out)*mask
-            outsamples[:, :, :, idata] = np.real(ifftn(ifftshift(insamples_fft)) * (L_out**3/L_in**3))
+            insamples_fft = crop_pad(fftshift(fftn(insamples[idata])), L_out)*mask
+            outsamples[idata] = np.real(ifftn(ifftshift(insamples_fft)) * (L_out**3/L_in**3))
 
     else:
         raise RuntimeError('Number of dimensions > 3 for input objects.')
@@ -267,7 +267,7 @@ def vol2img(volume, rots, L=None, dtype=None):
         fv = centered_fft3(volume)
         padded_volume = np.zeros((L, L, L), dtype=dtype)
         padded_volume[dL+1:dL+lv+1, dL+1:dL+lv+1, dL+1:dL+lv+1] = fv
-        volume = centered_ifft3(padded_volume)
+        volume = centered_ifft3_C(padded_volume)
         ensure(np.norm(np.imag(volume[:]))/np.norm(volume[:]) < 1.0e-5,
                "The image part of volume is related large (>1.0e-5).")
         #  The new volume size
@@ -284,20 +284,20 @@ def vol2img(volume, rots, L=None, dtype=None):
     for i in range(num_rots):
         pts_rot[:, :, i] = rots[i, :, :].T @ pts
 
-    pts_rot = m_reshape(pts_rot, (3, lv**2*num_rots))
+    #pts_rot = m_reshape(pts_rot, (3, lv**2*num_rots))
 
     pts_rot = -2*pts_rot/lv
 
     im_f = Plan(volume.shape, -pts_rot).transform(volume)
 
-    im_f = m_reshape(im_f, (lv, lv, -1))
+    #im_f = m_reshape(im_f, (lv, lv, -1))
 
     if lv % 2 == 0:
         pts_rot = m_reshape(pts_rot, (3, lv, lv, num_rots))
         im_f = im_f * np.exp(1j*np.sum(pts_rot, 0)/2)
-        im_f = im_f * np.expand_dims(np.exp(2*np.pi*1j*(grid2d['x'] +grid2d['y']-1)/(2*lv)), 2)
+        im_f = im_f * np.expand_dims(np.exp(2*np.pi*1j*(grid2d['x'] +grid2d['y']-1)/(2*lv)), 0)
 
-    im = centered_ifft2_F(im_f)
+    im = centered_ifft2_C(im_f)
     if lv % 2 == 0:
         im = im * m_reshape(np.exp(2*np.pi*1j*(grid2d['x'] +grid2d['y'])/(2*lv)), (lv, lv, 1))
 
