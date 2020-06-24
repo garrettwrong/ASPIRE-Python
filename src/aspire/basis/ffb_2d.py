@@ -208,7 +208,7 @@ class FFBBasis2D(FBBasis2D):
             pf[isample] = nufft3(x[isample], 2 * pi * freqs, self.sz)
 
         
-        print('pf[0]', pf[0])
+        #print('pf[0]', pf[0])
         #pf = m_reshape(pf, new_shape=(n_r, n_theta, n_data))
         pf = np.reshape(pf, (n_data, n_r, n_theta))
 
