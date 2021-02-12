@@ -31,6 +31,9 @@ jobs:
           # Exclude 3.6-stable so we can add pre and post tasks to that environment.
           - python-version: 3.6
             pyenv: stable
+          # Python 3.9 is already development, py39-dev is too unstable
+          - python-version: 3.9
+            pyenv: dev
         include:
           # Re-include 3.6-stable with additional tox tasks.
           - python-version: 3.6
