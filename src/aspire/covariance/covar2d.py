@@ -139,14 +139,31 @@ class RotCov2D:
 
         for ell in range(1, self.basis.ell_max + 1):
             mask = self.basis._indices["ells"] == ell
-            mask_pos = [
-                mask[i] and (self.basis._indices["sgns"][i] == +1)
-                for i in range(len(mask))
-            ]
-            mask_neg = [
-                mask[i] and (self.basis._indices["sgns"][i] == -1)
-                for i in range(len(mask))
-            ]
+            mask_pos = np.array(
+                [
+                    mask[i] and (self.basis._indices["sgns"][i] == +1)
+                    for i in range(len(mask))
+                ],
+                dtype=bool,
+            )
+            mask_neg = np.array(
+                [
+                    mask[i] and (self.basis._indices["sgns"][i] == -1)
+                    for i in range(len(mask))
+                ],
+                dtype=bool,
+            )
+
+            # import pdb
+            # pdb.set_trace()
+
+            logger.debug(
+                f"xxx mask.shape {mask.shape}, len(mask_pos) {len(mask_pos)}, len(mask_neg) {len(mask_neg)} coeffs.shape {coeffs.shape}"
+            )
+
+            assert mask_pos.shape == (self.basis.count,)
+            assert mask_neg.shape == (self.basis.count,)
+
             covar_ell_diag = np.array(
                 coeffs[:, mask_pos].T @ coeffs[:, mask_pos]
                 + coeffs[:, mask_neg].T @ coeffs[:, mask_neg]
