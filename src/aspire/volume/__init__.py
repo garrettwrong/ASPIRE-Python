@@ -7,8 +7,9 @@ import aspire.image
 from aspire.nufft import nufft
 from aspire.numeric import fft, xp
 from aspire.utils import ensure, mat_to_vec, vec_to_mat
-from aspire.utils.coor_trans import grid_2d
+from aspire.utils.coor_trans import grid_2d, grid_3d
 from aspire.utils.matlab_compat import m_reshape
+from aspire.utils.random import Random, randn
 from aspire.utils.rotation import Rotation
 
 logger = logging.getLogger(__name__)
@@ -50,7 +51,7 @@ class Volume:
 
     def __init__(self, data):
         """
-        Create a volume initialized with data.
+        Create a volume initialized with `data`.
 
         Volumes should be N x L x L x L,
         or L x L x L which implies N=1.
@@ -258,6 +259,169 @@ class Volume:
 
     def denoise(self):
         raise NotImplementedError
+
+    @staticmethod
+    def gaussian_blob_vols(L=8, C=2, K=16, alpha=1, Cn=1, seed=None, dtype=np.float64):
+        """
+        Generate Gaussian blob volumes
+        :param L: The size of the volumes
+        :param C: The number of volumes to generate
+        :param K: The number of blobs
+        :param alpha: A scale factor of the blob widths
+
+        :return: A Volume instance containing C Gaussian blob volumes.
+        """
+
+        assert Cn == 1, "josh to add his Cn stuff"
+
+        def gaussian_blobs(K, alpha):
+            Q = np.zeros(shape=(3, 3, K)).astype(dtype)
+            D = np.zeros(shape=(3, 3, K)).astype(dtype)
+            mu = np.zeros(shape=(3, K)).astype(dtype)
+
+            for k in range(K):
+                V = randn(3, 3).astype(dtype) / np.sqrt(3)
+                Q[:, :, k] = qr(V)[0]
+                D[:, :, k] = alpha ** 2 / 16 * np.diag(np.sum(abs(V) ** 2, axis=0))
+                mu[:, k] = 0.5 * randn(3) / np.sqrt(3)
+
+            return Q, D, mu
+
+        vols = np.zeros(shape=(C, L, L, L)).astype(dtype)
+        with Random(seed):
+            for k in range(C):
+                Q, D, mu = gaussian_blobs(K, alpha)
+                vols[k] = Volume._eval_gaussian_blobs(L, Q, D, mu, dtype=dtype)
+        return Volume(vols)
+
+    @staticmethod
+    def _eval_gaussian_blobs(L, Q, D, mu, dtype=np.float64):
+        g = grid_3d(L, dtype=dtype)
+        coords = np.array(
+            [g["x"].flatten(), g["y"].flatten(), g["z"].flatten()], dtype=dtype
+        )
+
+        K = Q.shape[-1]
+        vol = np.zeros(shape=(1, coords.shape[-1])).astype(dtype)
+
+        for k in range(K):
+            coords_k = coords - mu[:, k, np.newaxis]
+            coords_k = (
+                Q[:, :, k] / np.sqrt(np.diag(D[:, :, k])) @ Q[:, :, k].T @ coords_k
+            )
+
+            vol += np.exp(-0.5 * np.sum(np.abs(coords_k) ** 2, axis=0))
+
+        vol = np.reshape(vol, g["x"].shape)
+
+        return vol
+
+    @staticmethod
+    def generate(L, C=1, subscript=None, seed=None):
+        """
+        :param L: resolution
+        :param C: number of volumes
+        """
+        assert (
+            subscript is None
+        ), "Volume.generate does not support symmetry/subscripts, use a SymmetricVolume"
+
+        # generate an array of data
+        return Volume.gaussian_blob_vols(L, C, Cn=1, seed=seed)
+
+
+class CnSymmetricVolume(Volume):
+    def __init__(self, data, Cn):
+        self.Cn = int(Cn)  # int
+        super().__init__(self, data)
+
+    def __str__(self):
+        f"I am a C{self.Cn} symetric..."
+
+    @staticmethod
+    def generate(L, C=1, subscript=2, seed=None):
+        Cn = int(subscript)  # ensure subscript sane
+
+        # generate an array of data,
+        vol_array = Volume.gaussian_blob_vols(..., Cn=Cn, seed=seed)
+
+        # construct and return CnSymmetricVolume instance
+        return CnSymmetricVolume(vol_array.asnumpy(), Cn)
+
+
+class DnSymmetricVolume(CnSymmetricVolume):
+    def __init__(self, data, Dn):
+        self.Dn = int(Dn)  # int
+        super().__init__(self, data)
+
+    def __str__(self):
+        f"I am a D{self.Cn} ..."
+
+    def generate(L, C=1, subscript=2, seed=None):
+        Dn = int(subscript)  # ensure subscript sane
+        # complicated stuff we're not sure about yet
+        vol_array_1 = Volume.gaussian_blob_vols(L, C, Cn=Dn, seed=seed)
+        vol_array_2 = Volume.gaussian_blob_vols(L, C, Cn=Dn, seed=seed)
+
+        def smash(a, b):
+            """here be dragons"""
+            return a + b
+
+        vol_array = smash(vol_array_1, vol_array_2)
+
+        return DnSymmetricVolume(vol_array, Dn)
+
+
+class TSymmetricVolume(Volume):
+    def __init__(self, data):
+        super().__init__(self, data)
+        raise NotImplementedError
+
+    def __str__(self):
+        "I am a T ..."
+
+    def generate(L, C=1, subscript=None, seed=None, dtype=np.float64):
+        assert subscript is None
+        vol_array = np.zeros((L,) * 3, dtype=dtype)
+        return TSymmetricVolume(vol_array)
+
+
+class OSymmetricVolume(Volume):
+    def __init__(self, data):
+        super().__init__(self, data)
+        raise NotImplementedError
+
+    def __str__(self):
+        "I am a O ..."
+
+    def generate(L, C=1, subscript=None, seed=None, dtype=np.float64):
+        assert subscript is None
+        vol_array = np.zeros((L,) * 3, dtype=dtype)
+        return OSymmetricVolume(vol_array)
+
+
+def parseSymmetry(symmetry_string):
+
+    subscript = None
+    sym_type = None
+    if symmetry_string is not None:
+        # safer to make string consistent
+        symmetry_string = symmetry_string.upper()
+        # get the first letter
+        sym_type = symmetry_string[0]
+        # if there is a second letter, get that
+        subscript = symmetry_string[1:] or None
+
+    # map our sym_types to classes of Volumes
+    map_sym_to_volumes = {
+        None: Volume,
+        "C": CnSymmetricVolume,
+        "D": DnSymmetricVolume,
+        "T": TSymmetricVolume,
+        "O": OSymmetricVolume,
+    }
+
+    return map_sym_to_volumes[sym_type], subscript
 
 
 class CartesianVolume(Volume):
