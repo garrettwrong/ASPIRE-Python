@@ -50,17 +50,6 @@ class Simulation(ImageSource):
 
         self.seed = seed
 
-        # We need to keep track of the original resolution we were initialized with,
-        # to be able to generate projections of volumes later, when we are asked to supply images.
-        self._original_L = L
-
-        if offsets is None:
-            offsets = L / 16 * randn(2, n, seed=seed).astype(dtype).T
-
-        if amplitudes is None:
-            min_, max_ = 2.0 / 3, 3.0 / 2
-            amplitudes = min_ + rand(n, seed=seed).astype(dtype) * (max_ - min_)
-
         if vols is None:
             _vols = LegacyGaussianBlob(
                 L=L, C=2, symmetry_type=None, seed=self.seed, dtype=self.dtype
@@ -77,6 +66,17 @@ class Simulation(ImageSource):
                 " In the future this will raise an error. Casting..."
             )
             self.vols = self.vols.astype(self.dtype)
+
+        # We need to keep track of the original resolution we were initialized with,
+        # to be able to generate projections of volumes later, when we are asked to supply images.
+        self._original_L = L
+
+        if offsets is None:
+            offsets = L / 16 * randn(2, n, seed=seed).astype(dtype).T
+
+        if amplitudes is None:
+            min_, max_ = 2.0 / 3, 3.0 / 2
+            amplitudes = min_ + rand(n, seed=seed).astype(dtype) * (max_ - min_)
 
         self.C = self.vols.n_vols
 
