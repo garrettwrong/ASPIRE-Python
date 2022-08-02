@@ -8,7 +8,8 @@ from .volume import (
 
 from .volume_synthesis import (  # isort:skip
     SyntheticVolumeBase,
-    LegacyGaussianBlob,
-    CnSymmetricGaussianBlob,
+    LegacyVolume,
+    CnSymmetricVolume,
+    BumpVolume,
 )
 
