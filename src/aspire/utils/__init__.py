@@ -11,6 +11,7 @@ from .coor_trans import (  # isort:skip
 )
 from .misc import (  # isort:skip
     abs2,
+    bump_3d,
     circ,
     gaussian_1d,
     gaussian_2d,
