@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apple Picker &mdash; ASPIRE 0.9.2 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Basic Image Array" href="basic_image_array.html" />
+    <link rel="prev" title="ASPIRE-Python Introduction" href="lecture_feature_demo.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> ASPIRE
+          </a>
+              <div class="version">
+                0.9.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Authors</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Galleries:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cov2d_simulation.html">2D Covariance Estimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orient3d_simulation.html">3D Image Orientation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image_class.html">ASPIRE Image Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lecture_feature_demo.html">ASPIRE-Python Introduction</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Apple Picker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#read-and-plot-micrograph">Read and Plot Micrograph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#initialize-apple">Initialize Apple</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pick-particles-and-find-centers">Pick Particles and Find Centers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot-the-picked-particles">Plot the Picked Particles</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="basic_image_array.html">Basic Image Array</a></li>
+<li class="toctree-l2"><a class="reference internal" href="class_averaging.html">Class Averaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cov3d_simulation.html">Covariance 3D Estimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generating_volume_projections.html">Generating 3D Volume Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image_expansion.html">Image Expansion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preprocess_imgs_sim.html">Image Preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="starfile.html">Starfile</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_experiments/index.html">Experiments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ASPIRE</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Tutorials</a> &raquo;</li>
+      <li>Apple Picker</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/auto_tutorials/apple_picker.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-tutorials-apple-picker-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="apple-picker">
+<span id="sphx-glr-auto-tutorials-apple-picker-py"></span><h1>Apple Picker<a class="headerlink" href="#apple-picker" title="Permalink to this headline">¶</a></h1>
+<p>We demonstrate ASPIRE’s particle picking methods using the <code class="docutils literal notranslate"><span class="pre">Apple</span></code> class.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">mrcfile</span>
+
+<span class="kn">from</span> <span class="nn">aspire.apple.apple</span> <span class="kn">import</span> <span class="n">Apple</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="read-and-plot-micrograph">
+<h2>Read and Plot Micrograph<a class="headerlink" href="#read-and-plot-micrograph" title="Permalink to this headline">¶</a></h2>
+<p>Here we demonstrate reading in and plotting a raw micrograph.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;data/falcon_2012_06_12-14_33_35_0.mrc&quot;</span>
+
+<span class="k">with</span> <span class="n">mrcfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mrc</span><span class="p">:</span>
+    <span class="n">micro_img</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">data</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Sample Micrograph&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">micro_img</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_apple_picker_001.png" srcset="../_images/sphx_glr_apple_picker_001.png" alt="Sample Micrograph" class = "sphx-glr-single-img"/></section>
+<section id="initialize-apple">
+<h2>Initialize Apple<a class="headerlink" href="#initialize-apple" title="Permalink to this headline">¶</a></h2>
+<p>Initiate ASPIRE’s <code class="docutils literal notranslate"><span class="pre">Apple</span></code> class.
+<code class="docutils literal notranslate"><span class="pre">Apple</span></code> admits many options relating to particle sizing and mrc processing.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">apple_picker</span> <span class="o">=</span> <span class="n">Apple</span><span class="p">(</span>
+    <span class="n">particle_size</span><span class="o">=</span><span class="mi">78</span><span class="p">,</span> <span class="n">min_particle_size</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span> <span class="n">max_particle_size</span><span class="o">=</span><span class="mi">156</span><span class="p">,</span> <span class="n">tau1</span><span class="o">=</span><span class="mi">710</span><span class="p">,</span> <span class="n">tau2</span><span class="o">=</span><span class="mi">7100</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="pick-particles-and-find-centers">
+<h2>Pick Particles and Find Centers<a class="headerlink" href="#pick-particles-and-find-centers" title="Permalink to this headline">¶</a></h2>
+<p>Here we use the <code class="docutils literal notranslate"><span class="pre">process_micrograph</span></code> method from the <code class="docutils literal notranslate"><span class="pre">Apple</span></code> class to find particles in the micrograph.
+It will also return an image suitable for display, and optionally save a jpg.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">centers</span><span class="p">,</span> <span class="n">particles_img</span> <span class="o">=</span> <span class="n">apple_picker</span><span class="o">.</span><span class="n">process_micrograph</span><span class="p">(</span>
+    <span class="n">filename</span><span class="p">,</span> <span class="n">show_progress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">create_jpg</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="c1"># Note that if you only desire ``centers`` you may call ``process_micrograph_centers(filename,...)``.</span>
+</pre></div>
+</div>
+</section>
+<section id="plot-the-picked-particles">
+<h2>Plot the Picked Particles<a class="headerlink" href="#plot-the-picked-particles" title="Permalink to this headline">¶</a></h2>
+<p>Observe the number of particles picked and plot the result from <code class="docutils literal notranslate"><span class="pre">Apple</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">img_dim</span> <span class="o">=</span> <span class="n">micro_img</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">particles</span> <span class="o">=</span> <span class="n">centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dimensions of the micrograph are </span><span class="si">{</span><span class="n">img_dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">particles</span><span class="si">}</span><span class="s2"> particles were picked&quot;</span><span class="p">)</span>
+
+<span class="c1"># sphinx_gallery_thumbnail_number = 2</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">particles_img</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_apple_picker_002.png" srcset="../_images/sphx_glr_apple_picker_002.png" alt="apple picker" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  2.353 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-apple-picker-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/7f79378cca33d741b5302f71ad096b06/apple_picker.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">apple_picker.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/3d57017e0842105f213de3e1f250a309/apple_picker.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">apple_picker.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="lecture_feature_demo.html" class="btn btn-neutral float-left" title="ASPIRE-Python Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="basic_image_array.html" class="btn btn-neutral float-right" title="Basic Image Array" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Princeton University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
