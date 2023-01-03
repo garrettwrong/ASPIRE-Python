@@ -13,6 +13,7 @@ from aspire.utils import (
     acorr,
     ainner,
     anorm,
+    grid_2d,
     make_symmat,
     uniform_random_angles,
     vecmat_to_volmat,
@@ -248,7 +249,7 @@ class Simulation(ImageSource):
             self.filter_indices[indices],
         )
 
-    def estimate_signal_mean(self, sample_n=100):
+    def estimate_signal_mean(self, sample_n=100, support_radius=1):
         """
         Estimate the signal mean of `sample_n` projections.
 
@@ -261,12 +262,15 @@ class Simulation(ImageSource):
                 " Accuracy may be impaired."
             )
 
+        g2d = grid_2d(self.L, indexing="yx", dtype=self.dtype)
+        mask = g2d["r"] < support_radius
+        
         # Note, for simulation we are assuming `sample_n` is random
-        estimated_mu = np.mean(self.projections[:sample_n].asnumpy())
+        estimated_mu = np.mean(self.projections[:sample_n].asnumpy()[...,mask])
         logger.info(f"Estimated signal mu {estimated_mu}")
         return estimated_mu
 
-    def estimate_signal_var(self, sample_n=100):
+    def estimate_signal_var(self, sample_n=100, support_radius=1):
         """
         Estimate the signal the variance of `sample_n` projections.
 
@@ -279,12 +283,20 @@ class Simulation(ImageSource):
                 " Accuracy may be impaired."
             )
 
+        g2d = grid_2d(self.L, indexing="yx", dtype=self.dtype)
+        mask = g2d["r"] < support_radius
+
         # Note, for simulation we are assuming `sample_n` is random
-        estimated_var = np.var(self.projections[:sample_n].asnumpy())
+        estimated_var = np.var(self.projections[:sample_n].asnumpy()[..., mask])
+        # m1 = np.sum(self.images[:sample_n].asnumpy()[..., mask]) / (np.sum(mask)*sample_n)
+        # m2 = np.sum(self.images[:sample_n].asnumpy()[..., mask]**2) / (np.sum(mask)*sample_n)
+        # estimated_var = m2 - m1**2
+        # breakpoint()
+        
         logger.info(f"Estimated signal var {estimated_var}")
         return estimated_var
 
-    def estimate_asnr(self, sample_n=100):
+    def estimate_asnr(self, sample_n=100, support_radius=1):
         """
         Estimate the SNR of the simulated data set using estimated mu/variance.
 
@@ -300,10 +312,11 @@ class Simulation(ImageSource):
             )
 
         noise_var = self.noise_adder.noise_var
+        mu = self.estimate_signal_mean(sample_n=sample_n, support_radius=support_radius)
 
-        return self.estimate_signal_mean(sample_n=sample_n) / noise_var
+        return mu / noise_var
 
-    def estimate_snr(self, sample_n=100):
+    def estimate_snr(self, sample_n=100,support_radius=1):
         """
         Estimate the SNR of the simulated data set using
         estimated signal variance / noise variance.
@@ -318,11 +331,12 @@ class Simulation(ImageSource):
             )
 
         noise_var = self.noise_adder.noise_var
-
-        return self.estimate_signal_var(sample_n=sample_n) / noise_var
+        signal_var = self.estimate_signal_var(sample_n=sample_n, support_radius=support_radius)
+        
+        return  signal_var / noise_var
 
     @classmethod
-    def from_snr(cls, target_snr, *args, **kwargs):
+    def from_snr(cls, target_snr, *args, sample_n=100, support_radius=1, **kwargs,):
         """
         Generates a Simulation source with a WhiteNoiseAdder
         configured to produce a target signal to noise ratio.
@@ -342,7 +356,9 @@ class Simulation(ImageSource):
             )
 
         # Estimate the required noise variance
-        noise_var = sim.estimate_signal_var() / target_snr
+        signal_var = sim.estimate_signal_var(sample_n=sample_n, support_radius=support_radius)
+        #noise_var =  signal_var / target_snr
+        noise_var = signal_var/ (target_snr - 1)
 
         # Assign the noise_adder
         sim.noise_adder = WhiteNoiseAdder(var=noise_var)
