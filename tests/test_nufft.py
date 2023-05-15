@@ -945,3 +945,29 @@ class SimTestCase(TestCase):
 
     def testAdjoint2_64(self):
         self._testAdjoint("pynfft", np.float64)
+
+    # pynufft
+
+    def testTransform0_32(self):
+        self._testTransform("pynufft", np.float32)
+
+    def testTransformMany0_32(self):
+        self._testTransformMany("pynufft", np.float32)
+
+    def testAdjoint0_32(self):
+        self._testAdjoint("pynufft", np.float32)
+
+    def testAdjointMany0_32(self):
+        self._testAdjointMany("pynufft", np.float32)
+
+    def testTransform0_64(self):
+        self._testTransform("pynufft", np.float64)
+
+    def testTransformMany0_64(self):
+        self._testTransformMany("pynufft", np.float64)
+
+    def testAdjoint0_64(self):
+        self._testAdjoint("pynufft", np.float64)
+
+    def testAdjointMany0_64(self):
+        self._testAdjointMany("pynufft", np.float64)

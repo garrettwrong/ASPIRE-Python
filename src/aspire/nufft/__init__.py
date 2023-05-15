@@ -38,6 +38,10 @@ def check_backends(raise_errors=True):
             'pynfft'
                 The Python wrapper for the Chemnitz NFFT library
                 https://www-user.tu-chemnitz.de/~potts/nfft/
+            'pynufft'
+                The Python wrapper for PyNUFFT
+                https://github.com/jyhmiinlin/pynufft
+
         :return: The proper Plan-subclass if the backend is expected to work or None otherwise.
 
         It's important to keep these checks lightweight since all usable backend classes are cached on module load.
@@ -76,6 +80,16 @@ def check_backends(raise_errors=True):
                 from aspire.nufft.pynfft import PyNfftPlan
 
                 plan_class = PyNfftPlan
+            except Exception as e:
+                msg = str(e)
+
+        elif backend == "pynufft":
+            try:
+                from pynufft import NUFFT
+
+                from aspire.nufft.pynufft import pynufftPlan
+
+                plan_class = pynufftPlan
             except Exception as e:
                 msg = str(e)
 

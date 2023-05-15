@@ -26,7 +26,7 @@ logging:
 nufft:
     # NUFFT backends should be one of finufft, cufinufft, pynfft.
     # They will be attempted in order from left to right.
-    backends: [cufinufft, finufft, pynfft]
+    backends: [pynufft, finufft, pynfft]
 
 ray:
     # Ray will default to a OS specific tmp dir.
